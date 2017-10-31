@@ -13,6 +13,7 @@ object DataStructure {
   //Exercise 3.3
   def setHead[A](ls: List[A], newHead: A): List[A] = ls match {
     case _ :: xs => newHead :: xs
+    case _ => newHead :: Nil
   }
 
   //Exercise 3.4

@@ -19,6 +19,10 @@ class DataStructure$Test extends FlatSpec {
     assert(setHead(List(1, 2, 3, 4, 5), 10) == List(10, 2, 3, 4, 5))
   }
 
+  "setHead" should "return a list" in {
+    assert(setHead(Nil, 1) == List(1))
+  }
+
   "drop" should "drop 3 element" in {
     assert(drop(List(1, 2, 3, 4, 5), 3) == List(4, 5))
   }
