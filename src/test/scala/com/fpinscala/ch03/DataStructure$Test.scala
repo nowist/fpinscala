@@ -20,7 +20,7 @@ class DataStructure$Test extends FlatSpec {
   }
 
   "setHead" should "return a list" in {
-    assert(setHead(Nil, 1) == List(1))
+    assertThrows[Error](setHead(Nil, 1))
   }
 
   "drop" should "drop 3 element" in {

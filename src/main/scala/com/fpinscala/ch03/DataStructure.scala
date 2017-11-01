@@ -13,12 +13,12 @@ object DataStructure {
   //Exercise 3.3
   def setHead[A](ls: List[A], newHead: A): List[A] = ls match {
     case _ :: xs => newHead :: xs
-    case _ => newHead :: Nil
+    case _ => throw new Error("Set head on empty list")
   }
 
   //Exercise 3.4
   def drop[A](l: List[A], n: Int): List[A] =
-    if (l.isEmpty || n == 0) l
+    if (l.isEmpty || n <= 0) l
     else drop(l.tail, n - 1)
 
   //Exercise 3.5
