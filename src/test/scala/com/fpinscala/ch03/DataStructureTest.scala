@@ -6,7 +6,7 @@ import DataStructure._
 /**
   * Created by wqlin on 17-10-30 19:53.
   */
-class DataStructure$Test extends FlatSpec {
+class DataStructureTest extends FlatSpec {
   "tail" should "throw Error" in {
     assertThrows[Error](tail(Nil))
   }

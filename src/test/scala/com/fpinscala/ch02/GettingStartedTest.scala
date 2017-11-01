@@ -6,7 +6,7 @@ import GettingStarted._
 /**
   * Created by wqlin on 17-10-30 18:57.
   */
-class GettingStarted$Test extends FlatSpec {
+class GettingStartedTest extends FlatSpec {
   // Test for exercise 2.1
   "fib" should "return the right answer for ith Fibonacci number" in {
     assert(fib(0) == 0)
