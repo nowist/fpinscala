@@ -129,10 +129,7 @@ sealed trait Stream[+A] {
     } append Stream(empty)
 
   //Exercise 5.16
-  def scanRight[B](z: B)(f: (A, B) => B): Stream[B] = this match {
-    case Cons(h,t) => cons(t())
-    case _ => cons(z,empty)
-  }
+  def scanRight[B](z: B)(f: (A, B) => B): Stream[B] = ???
 
 
 }
