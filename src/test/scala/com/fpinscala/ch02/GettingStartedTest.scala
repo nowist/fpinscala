@@ -17,7 +17,7 @@ class GettingStartedTest extends FlatSpec {
 
   // Test for exercise 2.2
   "isSorted" should "return false" in {
-    assert(!isSorted[Int](Array(1, 3, 2, 4, 5, 6), _ < _))
+    assert(!isSorted[Int](Array(1, 2, 3, 4, 5, 100, 7, 8, 9, 10, 11, 12, 13, 14), _ < _))
   }
 
   "isSorted" should "return true" in {
