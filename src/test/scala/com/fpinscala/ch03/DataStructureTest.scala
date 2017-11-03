@@ -1,7 +1,8 @@
 package com.fpinscala.ch03
 
 import org.scalatest.FlatSpec
-import DataStructure._
+import com.fpinscala.ch03.List._
+import com.fpinscala.ch03.Tree._
 
 /**
   * Created by wqlin on 17-10-30 19:53.
@@ -61,17 +62,21 @@ class DataStructureTest extends FlatSpec {
   }
 
   "append" should "append two list" in {
-    assert(append(List(1, 2, 3), List(4, 5, 6)) == List(1, 2, 3, 4, 5, 6))
-    assert(append(List(), List(1, 2, 3)) == List(1, 2, 3))
-    assert(append(List(1, 2, 3), List()) == List(1, 2, 3))
+    assert(appendViaFoldLeft(List(1, 2, 3), List(4, 5, 6)) == List(1, 2, 3, 4, 5, 6))
+    assert(appendViaFoldLeft(List(), List(1, 2, 3)) == List(1, 2, 3))
+    assert(appendViaFoldLeft(List(1, 2, 3), List()) == List(1, 2, 3))
+    assert(appendViaFoldRight(List(1, 2, 3), List(4, 5, 6)) == List(1, 2, 3, 4, 5, 6))
+    assert(appendViaFoldRight(List(), List(1, 2, 3)) == List(1, 2, 3))
+    assert(appendViaFoldRight(List(1, 2, 3), List()) == List(1, 2, 3))
   }
 
   "concatAll" should "concatenate all list" in {
     assert(concatAll(List(List('H, 'e, 'l), List('l, 'l, 'o, 'w), List('o, 'r, 'l, 'd))) == List('H, 'e, 'l, 'l, 'l, 'o, 'w, 'o, 'r, 'l, 'd))
+    assert(concatAll(List(List(1, 2, 3), List(4), List(5, 6), List(8), List(9), List(10))) == List(1, 2, 3, 4, 5, 6, 8, 9, 10))
   }
 
   "plusOne" should "increment element by one" in {
-    assert(plusOne(List(1, 2, 3)) == List(2, 3, 4))
+    assert(plusOne(List(1, 2, 3, 4)) == List(2, 3, 4, 5))
   }
 
   "DoubleToString" should "convert all double to string" in {
@@ -84,6 +89,7 @@ class DataStructureTest extends FlatSpec {
 
   "flatMap" should "flatten list" in {
     assert(flatMap(List(1, 2, 3))(i => List(i, i)) == List(1, 1, 2, 2, 3, 3))
+    assert(flatMapViaFoldRight(List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))(i => List(i, i)) == List(1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10))
   }
 
   "filterViaFlatMap" should "filter out add even number" in {
@@ -104,18 +110,23 @@ class DataStructureTest extends FlatSpec {
 
   "size" should "return the size of a tree" in {
     assert(size(Branch(Branch(Leaf(1), Leaf(2)), Branch(Leaf(3), Leaf(4)))) == 7)
+    assert(sizeViaFold(Branch(Branch(Leaf(1), Leaf(2)), Branch(Leaf(3), Leaf(4)))) == 7)
   }
 
   "maximum" should "return the maximum element" in {
     assert(maximum(Branch(Branch(Leaf(1), Leaf(2)), Branch(Leaf(3), Leaf(4)))) == 4)
+    assert(maximumViaFold(Branch(Branch(Leaf(1), Leaf(2)), Branch(Leaf(3), Leaf(4)))) == 4)
   }
 
   "depth" should "return the maximum depth of a tree" in {
     assert(depth(Branch(Leaf(1), Branch(Branch(Leaf(2), Leaf(3)), Branch(Leaf(4), Branch(Leaf(5), Branch(Leaf(6), Leaf(7))))))) == 6)
+    assert(depthViaFold(Branch(Leaf(1), Branch(Branch(Leaf(2), Leaf(3)), Branch(Leaf(4), Branch(Leaf(5), Branch(Leaf(6), Leaf(7))))))) == 6)
   }
 
   "map" should "apply function to every element and return a new tree" in {
-    assert(map(Branch(Leaf(1), Branch(Branch(Leaf(2), Leaf(3)), Branch(Leaf(4), Branch(Leaf(5), Branch(Leaf(6), Leaf(7)))))))(a => a + 1) ==
+    assert(Tree.map(Branch(Leaf(1), Branch(Branch(Leaf(2), Leaf(3)), Branch(Leaf(4), Branch(Leaf(5), Branch(Leaf(6), Leaf(7)))))))(a => a + 1) ==
+      Branch(Leaf(2), Branch(Branch(Leaf(3), Leaf(4)), Branch(Leaf(5), Branch(Leaf(6), Branch(Leaf(7), Leaf(8)))))))
+    assert(Tree.mapViaFold(Branch(Leaf(1), Branch(Branch(Leaf(2), Leaf(3)), Branch(Leaf(4), Branch(Leaf(5), Branch(Leaf(6), Leaf(7)))))))(a => a + 1) ==
       Branch(Leaf(2), Branch(Branch(Leaf(3), Leaf(4)), Branch(Leaf(5), Branch(Leaf(6), Branch(Leaf(7), Leaf(8)))))))
   }
 }
