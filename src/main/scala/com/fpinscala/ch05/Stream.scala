@@ -7,7 +7,6 @@ import Stream._
   * Created by wqlin on 17-10-31 14:13.
   */
 sealed trait Stream[+A] {
-
   //Exercise 5.1
   def toList: List[A] = {
     var lb = new collection.mutable.ListBuffer[A]
@@ -22,11 +21,16 @@ sealed trait Stream[+A] {
     toList(this)
   }
 
-  //straightforward recursive solution
-  //def toList: List[A] = this match {
-  //case Empty => Nil
-  //case Cons(h, t) => h() :: t().toList
-  //}
+  //Tail recursive solution
+  def toListTailRec: List[A] = {
+    @annotation.tailrec
+    def go(s: Stream[A], l: List[A]): List[A] = s match {
+      case Empty => l
+      case Cons(h, t) => go(t(), h() :: l)
+    }
+
+    go(this, Nil).reverse
+  }
 
   //Exercise 5.2
   def take(n: Int): Stream[A] = this match {
@@ -34,9 +38,15 @@ sealed trait Stream[+A] {
     case _ => Empty
   }
 
-  def drop(n: Int): Stream[A] = this match {
+  @annotation.tailrec
+  final def drop(n: Int): Stream[A] = this match {
     case Cons(_, t) if n > 0 => t().drop(n - 1)
     case _ => this
+  }
+
+  def exists(p: A => Boolean): Boolean = this match {
+    case Cons(h, t) => p(h()) || t().exists(p)
+    case _ => false
   }
 
   //Exercise 5.3
@@ -51,6 +61,9 @@ sealed trait Stream[+A] {
     case _ => true
   }
 
+  def forAllViaFoldRight(p: A => Boolean): Boolean =
+    foldRight(true)((h, t) => p(h) && t)
+
   def foldRight[B](z: => B)(f: (A, => B) => B): B = this match {
     case Cons(h, t) => f(h(), t().foldRight(z)(f))
     case _ => z
@@ -58,12 +71,11 @@ sealed trait Stream[+A] {
 
   //Exercise 5.5
   def takeWhileViaFoldRight(p: A => Boolean): Stream[A] =
-    foldRight(empty[A])((a, b) => if (p(a)) cons(a, b) else Empty)
+    foldRight(empty[A])((h, t) => if (p(h)) cons(h, t) else empty)
 
   //Exercise 5.6
   def headOption: Option[A] =
     foldRight(Option.empty[A])((a, _) => Some(a))
-
 
   //Exercise 5.7
   def map[B](f: A => B): Stream[B] =
@@ -86,10 +98,18 @@ sealed trait Stream[+A] {
     }
 
   def takeViaUnfold(n: Int): Stream[A] =
-    unfold(this) {
-      case Cons(h, t) if n > 0 => Some(h(), t().takeViaUnfold(n - 1))
+    unfold((this, n)) {
+      case (Cons(h, t), i) if i > 1 => Some(h(), (t(), i - 1))
+      case (Cons(h, _), i) if i == 1 => Some(h(), (empty, 0))
       case _ => None
     }
+
+  //Bad implementation. Could lead to stack overflow
+  //def takeViaUnfold(n: Int): Stream[A] =
+  //unfold(this) {
+  //case Cons(h, t) if n > 0 => Some(h(), t().takeViaUnfold(n - 1))
+  //case _ => None
+  //}
 
   def takeWhileViaUnfold(p: A => Boolean): Stream[A] =
     unfold(this) {
@@ -111,15 +131,11 @@ sealed trait Stream[+A] {
       case _ => None
     }
 
-
   //Exercise 5.14
-  def startsWith[A](s: Stream[A]): Boolean =
-    (this zipAll s).forAll {
-      case (Some(a), Some(b)) => if (a == b) true else false
-      case (None, Some(_)) => false
-      case (Some(_), None) => true
+  def startsWith[B >: A](s: Stream[B]): Boolean =
+    (this zipAll s).takeWhile(_._2.nonEmpty).forAll {
+      case (a, b) => a == b
     }
-
 
   //Exercise 5.15
   def tails: Stream[Stream[A]] =
@@ -128,11 +144,29 @@ sealed trait Stream[+A] {
       case _ => None
     } append Stream(empty)
 
+  def hasSubsequence[A](s: Stream[A]): Boolean =
+    tails exists (_ startsWith s)
+
   //Exercise 5.16
-  def scanRight[B](z: B)(f: (A, B) => B): Stream[B] = ???
+  def scanRight[B](z: B)(f: (A, B) => B): Stream[B] =
+    foldRight((z, Stream(z))) { (h, s) =>
+      lazy val ss = s
+      val hh = f(h, ss._1)
+      (hh, cons(hh, ss._2))
+    }._2
 
-
+  //Another implementation. In either case, the method could cause stack overflow error if stream is large
+  //    def scanRight[B](z: B)(f: (A, B) => B): Stream[B] = this match {
+  //      case Cons(h, t) =>
+  //        lazy val s = t().scanRight(z)(f)
+  //        s match {
+  //          case Cons(hh, _) => cons(f(h(), hh()), s)
+  //          case _ => s
+  //        }
+  //      case _ => Stream(z)
+  //    }
 }
+
 
 case object Empty extends Stream[Nothing]
 
@@ -152,7 +186,7 @@ object Stream {
 
   //Exercise 5.8
   def constant[A](a: A): Stream[A] = {
-    lazy val tail: Stream[A] = Cons(() => a, () => tail)
+    lazy val tail: Stream[A] = cons(a, tail)
     tail
   }
 
@@ -174,6 +208,10 @@ object Stream {
       case None => Empty
       case Some((a, s)) => cons(a, unfold(s)(f))
     }
+
+  //An alternative implementation
+  def unfoldViaMap[A, S](z: S)(f: S => Option[(A, S)]): Stream[A] =
+    f(z).map { case (a, s) => cons(a, unfoldViaMap(s)(f)) } getOrElse empty
 
   //Exercise 5.12
   def onesViaUnfold(): Stream[Int] =

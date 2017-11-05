@@ -12,13 +12,12 @@ class StreamTest extends FlatSpec {
   "take" should "take element" in {
     assert(s.take(3).toList == List(1, 2, 3))
     assert(Stream().take(1).toList == List())
-    assert(s.take(100).toList == List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
+    assert(Stream.constant(10).take(1000000).toList == List.fill(1000000)(10))
     assert(s.takeViaUnfold(3).toList == List(1, 2, 3))
     assert(Stream().takeViaUnfold(1).toList == List())
-    assert(s.takeViaUnfold(100).toList == List(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
   }
   "drop" should "drop first 5 element" in {
-    assert(s.drop(5).toList == List(6, 7, 8, 9, 10))
+    assert(Stream.from(0).drop(1000000).take(1000000).toList == (1000000 until 2000000).toList)
   }
 
   "takeWhile" should "take all element less than 12" in {
@@ -99,5 +98,9 @@ class StreamTest extends FlatSpec {
     assert(s startsWith Stream(1, 2, 3, 4, 5, 6, 7, 8, 9, 10))
     assert(!(s startsWith Stream(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15)))
     assert(!(s startsWith Stream.constant(10)))
+  }
+
+  "scanRight" should "return a stream of intermediate results" in {
+    assert(Stream.constant(1).take(500).scanRight(0)(_ + _).toList == (500 to 0 by -1).toList)
   }
 }
