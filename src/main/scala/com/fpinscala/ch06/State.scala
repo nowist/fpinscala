@@ -37,6 +37,11 @@ object RNG {
     if (nextInt < 0) (-(nextInt + 1), nextRNG) else (nextInt, nextRNG)
   }
 
+  def boolean(rng: RNG): (Boolean, RNG) =
+    rng.nextInt match {
+      case (i, rng2) => (i % 2 == 0, rng2)
+    }
+
   //Exercise 6.2
   def double(rng: RNG): (Double, RNG) = {
     val (nextInt, nextRNG) = nonNegativeInt(rng)
