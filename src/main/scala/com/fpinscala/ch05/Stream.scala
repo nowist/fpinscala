@@ -44,6 +44,12 @@ sealed trait Stream[+A] {
     case _ => this
   }
 
+  @annotation.tailrec
+  final def find(f: A => Boolean): Option[A] = this match {
+    case Empty => None
+    case Cons(h, t) => if (f(h())) Some(h()) else t().find(f)
+  }
+
   def exists(p: A => Boolean): Boolean = this match {
     case Cons(h, t) => p(h()) || t().exists(p)
     case _ => false
@@ -130,6 +136,9 @@ sealed trait Stream[+A] {
       case (Cons(h, t), Empty) => Some((Some(h()), None), (t(), empty))
       case _ => None
     }
+
+  def zip[B](s2: Stream[B]): Stream[(A, B)] =
+    zipWith(s2)((_, _))
 
   //Exercise 5.14
   def startsWith[B >: A](s: Stream[B]): Boolean =
