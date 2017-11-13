@@ -93,15 +93,15 @@ object List {
   /*
   foldLeft and foldRight operation can be illustrate as follows:
   foldLeft:                 foldRight:
-         an                        a1
-        / \                       /  \
-       ... op                    op  ...
-       / \                           / \
-      a2  op                        op a2
-      /\                               /\
-    a1 op                            op a1
-     /\                                  /\
-    B op                                op B
+         op                        op
+         /\                        /\
+        . an                      an .
+       .                              .
+      .                                .
+     / \                              / \
+    op a2                            a2 op
+    /\                                  /\
+   z a1                                a1 z
   Implementing foldLeft by using foldRight is very tricky and useless, and one implementation is as follows.
   The following explanation is cited from: https://github.com/fpinscala/fpinscala/blob/master/answers/src/main/scala/fpinscala/datastructures/List.scala
   The implementation builds up a chain of functions which, when called, results in the operations being performed
