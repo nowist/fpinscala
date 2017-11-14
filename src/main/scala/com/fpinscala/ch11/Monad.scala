@@ -73,7 +73,7 @@ trait Monad[F[_]] extends Functor[F] {
 
   //Exercise 11.6
   def filterM[A](ms: List[A])(f: A => F[Boolean]): F[List[A]] = ms.foldRight(unit(List[A]())) {
-    (a, as) => compose(f, (b:Boolean) => if (b) map(as)(a :: _) else as)(a)
+    (a, as) => compose(f, (b: Boolean) => if (b) map(as)(a :: _) else as)(a)
   }
 
   def filterM1[A](ms: List[A])(f: A => F[Boolean]): F[List[A]] = map(sequence(ms.map(x => map(f(x))(if (_) List(x) else List[A]()))))(_.flatten)
@@ -126,7 +126,7 @@ object Monad {
     def flatMap[A, B](pa: Par[A])(f: A => Par[B]): Par[B] = Par.flatMap(pa)(f)
   }
 
-  def parserMonad[ParseError, P[+ _]](p: Parsers[ParseError, P]) = new Monad[P] {
+  def parserMonad[P[+ _]](p: Parsers[P]) = new Monad[P] {
     def unit[A](a: => A) = p.succeed(a)
 
     def flatMap[A, B](ma: P[A])(f: A => P[B]) = p.flatMap(ma)(f)
